@@ -1,0 +1,86 @@
+
+\documentclass[12pt]{article}
+\usepackage{geometry}
+\geometry{left=1in,right=0.75in,top=1in,bottom=1in}
+
+\usepackage{newtxtext}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{newtxmath} % must come after amsXXX
+\usepackage{lastpage}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{url}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%================================
+\usepackage{enumerate}%\item 需要
+\usepackage{tabularx}% \table 
+\usepackage{booktabs}% 	\toprule
+\usepackage{float}%图片浮动
+\usepackage{subfigure}
+\usepackage{graphicx}
+\usepackage{bm}% reference
+\usepackage{indentfirst} 
+\setlength{\parindent}{2em} %2em代表首行缩进两个字符
+\usepackage{listings}%代码
+
+%================================
+\begin{document}
+\title{\vspace{-2cm}Project Proposal}
+\author{Hongyi\ Deng \quad Chengkai\ Shi}
+\maketitle
+
+\section{Group Membership}
+There are two members in our group.
+\begin{table}[H]
+	\begin{center}
+		\caption{Group Members}
+		\begin{tabular}{c|c|c}
+			\toprule
+			\multicolumn{1}{m{3cm}}{\centering Name}
+			&\multicolumn{1}{m{5cm}}{\centering UCD ID Number}
+			&\multicolumn{1}{m{5cm}}{\centering Email Address}\\
+			\midrule
+			$Hongyi \ Deng$& 922850710 & hdeng@ucdavis.edu\\
+			$Chengkai \ Shi$& 922813391 & CKShi@ucdavis.edu\\
+			\bottomrule
+		\end{tabular}
+	\end{center}
+\end{table}
+
+ 
+  
+\section{Data Set to Analyze}
+We choose one of the data sets posted on Canvas: Abalone Age. The data file is ``abalone.txt"
+
+
+
+\section{Questions of Interest}
+\begin{enumerate}[\bf 1.]
+	\item  Which of these measurements are significantly related to the number of rings(age)? That is, taking ``rings" as the response variable, which X variables should be included into the model?
+	\item The multicollinearity patterns within the X variables.
+	\item How to interpret the derived model? That is, how to understand the relationship between age and other variables? 
+\end{enumerate}
+
+
+
+\section{Plan for Data Analysis}
+\subsection{General Procedures}
+\begin{enumerate}[\bf 1.]
+	\item \textbf{Exploratory data analysis:} Taking ``rings" as the response variable, we examine the types of X variables, and find their rough distributions through histograms and pie charts. Moreover, we examine the relationships among X variables through the scatter plot matrix and Box plots. Besides, we detect possible outliers.
+	\item \textbf{Model investigation:} For one thing, we focus on deciding whether transformations are needed. For another, we examine if there should be interaction terms or high-order power terms. Residual plots, Q-Q plots and Box-Cox tests are used in this part.
+	\item \textbf{Model selection:} Apply stepwise regression to select proper variables, supplemented with significance tests. Criterion such as $C_p$, $AIC_p$ and $BIC_p$ are considered in this procedure.
+	\item \textbf{Model validation:} Check the model both internally and externally. Criterion like $C_p$ and $MSPE$ are considered. The model is going to be re-fitted if necessary.
+\end{enumerate}
+
+\subsection{Model Type}
+Due to the inconsistency of units, we mainly consider standardized linear regression model with 1 categorical variable, and use ordinary least-squares estimation. One important problem is how to deal with the categorical variable ``sex". Moreover, interaction or high-order power terms should be added if necessary.
+
+\subsection{Potential Pitfalls}
+\begin{enumerate}[\bf 1.]
+	\item \textbf{Multicollinearity within the X variables.} For example, intuitively, there are likely to be inner correlations between shucked weight and viscera weight. To deal with multicollinearity, we may be more careful in variable selection, or apply biased methods like ridge regression.
+	\item \textbf{Outliers.} We must deal with different kinds of outliers appropriately.
+	\item \textbf{Heteroscedasticity.} The model we derive might contain heteroscedasticity, which contradicts the basic model assumptions. For example, residuals from male samples can have different variances from those of female ones. The weighted least squares method may be useful to deal with this.
+\end{enumerate}
+\end{document}
