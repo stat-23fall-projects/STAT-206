@@ -1,0 +1,49 @@
+---
+title: "137 Project"
+author: "Hongyi Deng, Chengkai Shi"
+date: "2023-11-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+hiking = read.csv('hiking.csv', head = TRUE) #Data acquisition
+hiking = ts(hiking[,2], start = 2004, frequency = 12) #Transform data to time seires
+ts.plot(hiking) #Data visualization
+```
+
+It seems that there is no outliers and missing values, and our goal is to predict the future values.
+
+```{r}
+mt = filter(hiking, filter = c(0.5, rep(1, times = 11), 0.5), method = "convolution", sides = 2)/12
+ts.plot(hiking, mt, col = c("black","red"))
+
+diff = na.omit(hiking - mt)
+ts.plot(diff)
+
+mu_k = ts(rep(tapply(diff, cycle(diff), mean), times = 19), start = 2004, frequency = 12)
+s_k2 = mu_k - mean(mu_k)
+ts.plot(s_k2)
+
+deseason = hiking - s_k2
+ts.plot(deseason)
+ts.plot(hiking); lines(deseason, col = "red")
+
+mt2 = filter(deseason, filter = c(0.5, rep(1, times = 11),0.5), method = "convolution", sides = 2)/12
+ts.plot(deseason); lines(mt2, col = "red")
+
+res2 = deseason - mt2
+ts.plot(res2)
+
+```
+
+```{r}
+res3 = na.omit(res2)
+acf(res3, lag = 100)
+pacf(res3, lag = 100)
+```
+
+
