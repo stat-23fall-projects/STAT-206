@@ -1,0 +1,93 @@
+---
+title: "137 Project"
+author: "Hongyi Deng, Chengkai Shi"
+date: "2023-11-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Read and plot the time series data
+hiking = read.csv('hiking.csv', head = TRUE) #Data acquisition
+hiking = ts(hiking[,2], start = 2004, frequency = 12) #Transform data to time series
+ts.plot(hiking) #Data visualization
+```
+
+It seems that there is no outliers and missing values, and our goal is to predict the future values.
+
+```{r}
+# decompose and deseasonlize
+
+mt = filter(hiking, filter = c(0.5, rep(1, times = 11), 0.5), method = "convolution", sides = 2)/12
+ts.plot(hiking, mt, col = c("black","red"))
+
+diff = na.omit(hiking - mt)
+ts.plot(diff)
+
+mu_k = ts(rep(tapply(diff, cycle(diff), mean), times = 19), start = 2004, frequency = 12)
+s_k2 = mu_k - mean(mu_k)
+ts.plot(s_k2)
+
+deseason = hiking - s_k2
+ts.plot(deseason)
+ts.plot(hiking); lines(deseason, col = "red")
+
+mt2 = filter(deseason, filter = c(0.5, rep(1, times = 11),0.5), method = "convolution", sides = 2)/12
+ts.plot(deseason); lines(mt2, col = "red")
+
+res2 = deseason - mt2
+ts.plot(res2)
+
+```
+
+
+```{r}
+# Check the residual
+
+library(tseries)
+res3 = na.omit(res2)
+uncorrelation=Box.test(res3, lag = 20, type = "Ljung-Box") # Uncorrelation
+normality=shapiro.test(res3)  # Normality
+stationarity=adf.test(res3)   # Stationarity
+# The res3 time series is stationary, correlated and not normal. So it is not white noise and deserves analyzing.
+
+```
+
+
+```{r}
+# Model identification of ARMA(p,q)
+
+acf(res3, lag = 100)
+pacf(res3, lag = 100)   
+
+# We can primarily constrain p<=5,q<=4
+p_max=5; q_max=4; n=length(res3)      
+AIC=matrix(0,p_max,q_max); BIC=matrix(0,p_max,q_max)   # Since n=228 is a small sample, BIC works better
+
+for (i in 1:p_max)
+  for (j in 1:q_max)
+    {Model=arima(res2,order=c(i,0,j))
+     AIC[i,j]=AIC(Model,k=2)
+     BIC[i,j]=AIC(Model,k=log(n))}
+par(mfrow=c(1,2))
+    heatmap(AIC,main="Heatmap of AIC") 
+    heatmap(BIC,main="Heatmap of BIC") 
+
+# According to BIC, we finally choose ARMA(3,1) as our model
+Model_final=arima(res2,order=c(3,0,1))
+print(coefficients(Model_final))
+
+
+```
+
+```{r}
+# Spectral Analysis(to be continued)
+
+library(signal)
+spectral = spec.pgram(res3, taper = 0,log="n")
+```
+
+
